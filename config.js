@@ -4,7 +4,7 @@ const URL = "mongodb+srv://hyderdanish369:ham1Assi@cluster0.gyqcemy.mongodb.net/
 const CONNECT = async () => {
     try {
         await mongoose.connect(URL);
-        console.log('Data Base Connected')
+        console.log('DataBase Connected')
     } catch (err) {
         console.log(err);
     }
