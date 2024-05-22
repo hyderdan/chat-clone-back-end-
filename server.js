@@ -6,6 +6,7 @@ const {userROutes} = require('./routes/userRoutes')
 const app = express();
 const PORT = 3000;
 CONNECT();
+require("dotenv").config();
 app.use(bodyParser.json());
 app.use(cors(
     {
