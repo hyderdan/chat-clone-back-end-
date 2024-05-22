@@ -1,6 +1,7 @@
 const { userData } = require('../models/usersModel');
 const bcryp = require('bcrypt');
-
+const jwt = require('jsonwebtoken');
+// const JWTVALUE = process.env.KEY;
 
 const SignUp = async (req, res) => {
     try {
@@ -25,11 +26,27 @@ const SignUp = async (req, res) => {
 };
 const LoginUser = async (req, res) => {
     try {
+        const { phoneNo, password } = req.body;
+        const users = await userData.findOne({ phoneNo: phoneNo });
+        if (!users) {
+            console.log("user not exists");
+            res.status(202).json({ message: "User Doesn't Exist " });
+           
+        }
         
+        else if (users && (await bcryp.compare(password, users.password))) {
+            const token = jwt.sign({ phoneNo: users.phoneNo },process.env.KEY , {
+                expiresIn: '1hr'
+            });
+            console.log(token);
+            res.status(202).json({ message: 'welcome users', params: true, user_id: users._id, usertoken: token })
+        }else{
+            res.status(401).json({message: 'incorrect password'})
+        }
     } catch (err) {
         console.log(err);
     }
 }
 module.exports = {
-    SignUp
+    SignUp,LoginUser
 }
