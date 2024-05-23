@@ -31,22 +31,34 @@ const LoginUser = async (req, res) => {
         if (!users) {
             console.log("user not exists");
             res.status(202).json({ message: "User Doesn't Exist " });
-           
+
         }
-        
+
         else if (users && (await bcryp.compare(password, users.password))) {
-            const token = jwt.sign({ phoneNo: users.phoneNo },process.env.KEY , {
+            const token = jwt.sign({ phoneNo: users.phoneNo }, process.env.KEY, {
                 expiresIn: '1hr'
             });
             console.log(token);
             res.status(202).json({ message: 'welcome users', params: true, user_id: users._id, usertoken: token })
-        }else{
-            res.status(401).json({message: 'incorrect password'})
+        } else {
+            res.status(401).json({ message: 'incorrect password' })
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+const userDeatails = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await userData.findById(userId);
+        if (user) {
+            console.log(user);
+            res.status(202).json({ userdata: user })
         }
     } catch (err) {
         console.log(err);
     }
 }
 module.exports = {
-    SignUp,LoginUser
+    SignUp, LoginUser, userDeatails
 }
