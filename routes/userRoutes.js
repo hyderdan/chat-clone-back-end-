@@ -8,6 +8,7 @@ userROutes.use(bodyParser.urlencoded({ extended: true }));
 userROutes.post('/sigUp', userControlls.SignUp);
 userROutes.post('/login', userControlls.LoginUser);
 userROutes.get('/singleUser/:userId', userControlls.userDeatails);
+userROutes.post('/searchUser', userControlls.searchUser);
 
 module.exports = {
     userROutes

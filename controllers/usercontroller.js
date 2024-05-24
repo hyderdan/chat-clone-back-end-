@@ -52,13 +52,32 @@ const userDeatails = async (req, res) => {
         const { userId } = req.params;
         const user = await userData.findById(userId);
         if (user) {
-            console.log(user);
+            // console.log(user);
             res.status(202).json({ userdata: user })
         }
     } catch (err) {
         console.log(err);
     }
 }
+const searchUser = async (req, res) => {
+    try {
+        const { userName } = req.body;
+        // const array = [userName];
+        const finalArray = [];
+        const users = await userData.find({});
+        if(userName){
+            const filteredUsers = users.filter(user => user.username.startsWith(userName));
+            console.log(filteredUsers);
+            res.status(202).json({data:filteredUsers})
+           
+        }
+      
+        
+        
+    } catch (err) {
+        console.log(err);
+    }
+}
 module.exports = {
-    SignUp, LoginUser, userDeatails
+    SignUp, LoginUser, userDeatails, searchUser
 }
