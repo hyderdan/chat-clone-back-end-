@@ -65,19 +65,44 @@ const searchUser = async (req, res) => {
         // const array = [userName];
         const finalArray = [];
         const users = await userData.find({});
-        if(userName){
+        if (userName) {
             const filteredUsers = users.filter(user => user.username.startsWith(userName));
             console.log(filteredUsers);
-            res.status(202).json({data:filteredUsers})
-           
+            res.status(202).json({ data: filteredUsers })
+
         }
-      
-        
-        
+    } catch (err) {
+        console.log(err);
+    }
+}
+const AddToFriendList = async (req, res) => {
+    try {
+        const { friend_id } = req.body;
+        const { ID } = req.params;
+        const user = await userData.findById(ID);
+        // console.log(user);
+        const existingItemIndex = user.freindList.find((item) => item.freindId.toString() === friend_id);
+        if (existingItemIndex) {
+            res.status(202).json({ message: 'user already is in your friend list' })
+        } else {
+            user.freindList.push({ freindId: friend_id });
+            await user.save();
+            res.status(202).json({ message: 'user added to your friend list' })
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+const friends = async (req, res) => {
+    try {
+        const { userid } = req.params
+        const user = await userData.findById(userid);
+        const friendList = user.freindList.find((item) => item.freindId);
+        console.log(friendList);
     } catch (err) {
         console.log(err);
     }
 }
 module.exports = {
-    SignUp, LoginUser, userDeatails, searchUser
+    SignUp, LoginUser, userDeatails, searchUser, AddToFriendList, friends
 }

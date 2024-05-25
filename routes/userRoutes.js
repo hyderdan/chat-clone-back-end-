@@ -9,6 +9,8 @@ userROutes.post('/sigUp', userControlls.SignUp);
 userROutes.post('/login', userControlls.LoginUser);
 userROutes.get('/singleUser/:userId', userControlls.userDeatails);
 userROutes.post('/searchUser', userControlls.searchUser);
+userROutes.post('/AddFriend/:ID', userControlls.AddToFriendList);
+userROutes.get('friendList/:userid', userControlls.friends);
 
 module.exports = {
     userROutes
