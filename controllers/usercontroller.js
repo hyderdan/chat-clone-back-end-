@@ -1,6 +1,7 @@
 const { userData } = require('../models/usersModel');
 const bcryp = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { get } = require('mongoose');
 // const JWTVALUE = process.env.KEY;
 
 const SignUp = async (req, res) => {
@@ -97,9 +98,12 @@ const friends = async (req, res) => {
     try {
         const { userid } = req.params
         const user = await userData.findById(userid);
-        const friendList = user.freindList.find((item) => item.freindId);
-        console.log(friendList);
-    } catch (err) {
+        const friendIds = user.freindList.map(item => item.freindId);
+                console.log(friendIds);
+                const friendList = await userData.find({ _id: { $in: friendIds } });
+                console.log(friendList);
+        res.status(202).json({friendList:friendList});
+            } catch (err) {
         console.log(err);
     }
 }
