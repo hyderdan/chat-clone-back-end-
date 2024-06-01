@@ -99,14 +99,33 @@ const friends = async (req, res) => {
         const { userid } = req.params
         const user = await userData.findById(userid);
         const friendIds = user.freindList.map(item => item.freindId);
-                console.log(friendIds);
-                const friendList = await userData.find({ _id: { $in: friendIds } });
-                console.log(friendList);
-        res.status(202).json({friendList:friendList});
-            } catch (err) {
+        console.log(friendIds);
+        const friendList = await userData.find({ _id: { $in: friendIds } });
+        console.log(friendList);
+        res.status(202).json({ friendList: friendList });
+    } catch (err) {
+        console.log(err);
+    }
+}
+const AddToFavourates = async (req, res) => {
+    try {
+        const { FavId, userId } = req.body;
+        const user = await userData.findById(userId);
+        if (!user) {
+            console.log("user NOt Found");
+        }
+        const existingItemIndex = user.Favourates.find((item) => item.FavListId.toString() === FavId);
+        if (existingItemIndex) {
+            console.log("already added in favourates");
+        } else {
+            user.Favourates.push({ FavListId: FavId });
+            await user.save();
+            res.status(202).json({ message: "user Addded to Favourates" })
+        }
+    } catch (err) {
         console.log(err);
     }
 }
 module.exports = {
-    SignUp, LoginUser, userDeatails, searchUser, AddToFriendList, friends
+    SignUp, LoginUser, userDeatails, searchUser, AddToFriendList, friends, AddToFavourates
 }

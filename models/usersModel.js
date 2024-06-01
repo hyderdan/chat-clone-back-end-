@@ -12,6 +12,15 @@ const userSchema = new monngoose.Schema({
                 required: true
             }
         }
+    ],
+    Favourates: [
+        {
+            FavListId: {
+                type: monngoose.Schema.Types.ObjectId,
+                ref: 'users',
+                required: true
+            }
+        }
     ]
 });
 
