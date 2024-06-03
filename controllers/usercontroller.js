@@ -64,11 +64,10 @@ const searchUser = async (req, res) => {
     try {
         const { userName } = req.body;
         // const array = [userName];
-        const finalArray = [];
         const users = await userData.find({});
         if (userName) {
             const filteredUsers = users.filter(user => user.username.startsWith(userName));
-            console.log(filteredUsers);
+            // console.log(filteredUsers);
             res.status(202).json({ data: filteredUsers })
 
         }
@@ -83,7 +82,9 @@ const AddToFriendList = async (req, res) => {
         const user = await userData.findById(ID);
         // console.log(user);
         const existingItemIndex = user.freindList.find((item) => item.freindId.toString() === friend_id);
-        if (existingItemIndex) {
+        if (friend_id == ID) {
+            console.log(`can't add your own account to your Freind List`);
+        } else if (existingItemIndex) {
             res.status(202).json({ message: 'user already is in your friend list' })
         } else {
             user.freindList.push({ freindId: friend_id });
@@ -99,9 +100,9 @@ const friends = async (req, res) => {
         const { userid } = req.params
         const user = await userData.findById(userid);
         const friendIds = user.freindList.map(item => item.freindId);
-        console.log(friendIds);
+        // console.log(friendIds);
         const friendList = await userData.find({ _id: { $in: friendIds } });
-        console.log(friendList);
+        // console.log(friendList);
         res.status(202).json({ friendList: friendList });
     } catch (err) {
         console.log(err);
@@ -114,9 +115,15 @@ const AddToFavourates = async (req, res) => {
         if (!user) {
             console.log("user NOt Found");
         }
-        const existingItemIndex = user.Favourates.find((item) => item.FavListId.toString() === FavId);
-        if (existingItemIndex) {
-            console.log("already added in favourates");
+        const existingItemIndex = user.Favourates.findIndex((item) => item.FavListId.toString() === FavId);
+
+        if (userId == FavId) {
+            console.log(`Unfortunately, we were unable to add the your account to your favorites at this time.
+                        We apologize for any inconvenience this may have caused.`)
+        } else if (existingItemIndex !== -1) {
+            console.log("item Removed");
+            user.Favourates.splice(existingItemIndex, 1);
+            await user.save();
         } else {
             user.Favourates.push({ FavListId: FavId });
             await user.save();
@@ -126,6 +133,25 @@ const AddToFavourates = async (req, res) => {
         console.log(err);
     }
 }
+
+const GetFavourates = async (req, res) => {
+    try {
+
+        const { userId } = req.params;
+        const user = await userData.findById(userId);
+        if (!user) {
+            console.log('user Dont Exist');
+        } else {
+            const FavouratesIds = user.Favourates.map(item => item.FavListId);
+            const FavouratesDatas = await userData.find({ _id: { $in: FavouratesIds } });
+            console.log(FavouratesDatas);
+            res.status(202).json({ Favourates: FavouratesDatas });
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
+}
 module.exports = {
-    SignUp, LoginUser, userDeatails, searchUser, AddToFriendList, friends, AddToFavourates
+    SignUp, LoginUser, userDeatails, searchUser, AddToFriendList, friends, AddToFavourates, GetFavourates
 }
