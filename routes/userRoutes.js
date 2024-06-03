@@ -12,6 +12,7 @@ userROutes.post('/searchUser', userControlls.searchUser);
 userROutes.post('/AddFriend/:ID', userControlls.AddToFriendList);
 userROutes.get('/friendList/:userid', userControlls.friends);
 userROutes.post('/AddToFavourate', userControlls.AddToFavourates);
+userROutes.get('/GetFavourates/:userId', userControlls.GetFavourates);
 
 
 module.exports = {
