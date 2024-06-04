@@ -67,8 +67,9 @@ const searchUser = async (req, res) => {
         const users = await userData.find({});
         if (userName) {
             const filteredUsers = users.filter(user => user.username.startsWith(userName));
+            // const filteredUserIds = filteredUsers.map(user => user._id); // Assuming user ID is stored in the _id field
             // console.log(filteredUsers);
-            res.status(202).json({ data: filteredUsers })
+            res.status(202).json({ data: filteredUsers, })
 
         }
     } catch (err) {
@@ -81,15 +82,18 @@ const AddToFriendList = async (req, res) => {
         const { ID } = req.params;
         const user = await userData.findById(ID);
         // console.log(user);
-        const existingItemIndex = user.freindList.find((item) => item.freindId.toString() === friend_id);
+        const existingItemIndex = user.freindList.findIndex((item) => item.freindId.toString() === friend_id);
         if (friend_id == ID) {
             console.log(`can't add your own account to your Freind List`);
-        } else if (existingItemIndex) {
-            res.status(202).json({ message: 'user already is in your friend list' })
+        } else if (existingItemIndex !== -1) {
+            user.freindList.splice(existingItemIndex, 1);
+            res.status(202).json({ mes: 'user removed from your friend list' })
+            await user.save();
+
         } else {
             user.freindList.push({ freindId: friend_id });
+            res.status(202).json({ mes: 'user added to your friend list' });
             await user.save();
-            res.status(202).json({ message: 'user added to your friend list' })
         }
     } catch (err) {
         console.log(err);
@@ -100,10 +104,10 @@ const friends = async (req, res) => {
         const { userid } = req.params
         const user = await userData.findById(userid);
         const friendIds = user.freindList.map(item => item.freindId);
-        // console.log(friendIds);
+        console.log(friendIds);
         const friendList = await userData.find({ _id: { $in: friendIds } });
         // console.log(friendList);
-        res.status(202).json({ friendList: friendList });
+        res.status(202).json({ friendList: friendList, friendId: friendIds });
     } catch (err) {
         console.log(err);
     }
@@ -123,6 +127,7 @@ const AddToFavourates = async (req, res) => {
         } else if (existingItemIndex !== -1) {
             console.log("item Removed");
             user.Favourates.splice(existingItemIndex, 1);
+            res.status(202).json({ message: "user removed from Favourates" })
             await user.save();
         } else {
             user.Favourates.push({ FavListId: FavId });
@@ -145,7 +150,7 @@ const GetFavourates = async (req, res) => {
             const FavouratesIds = user.Favourates.map(item => item.FavListId);
             const FavouratesDatas = await userData.find({ _id: { $in: FavouratesIds } });
             console.log(FavouratesDatas);
-            res.status(202).json({ Favourates: FavouratesDatas });
+            res.status(202).json({ Favourates: FavouratesDatas, FavId: FavouratesIds });
         }
 
     } catch (err) {
