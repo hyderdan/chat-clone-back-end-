@@ -3,7 +3,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const {CONNECT} = require('./config');
 const {userROutes} = require('./routes/userRoutes');
-const socketIo = require('socket.io');
+const sockectIO = require('socket.io');
+const server = http.Server(app);
+const Io = sockectIO(server)
 const http = require('http');
 const app = express();
 const PORT = 3000;
@@ -20,7 +22,6 @@ app.use(cors(
 
 app.use('/users',userROutes);
 
-const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
         origin: "http://localhost:4200",
@@ -28,12 +29,16 @@ const io = socketIo(server, {
     }
 });
 
-io.on('connection', (socket) => {
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html'); // Example: Send a HTML file for the root route
+});
+
+io.on('connection', (client) => {
     console.log('a user connected');
-    socket.on('chat message', (msg) => {
+    client.on('chat message', (msg) => {
         io.emit('chat message', msg);
     });
-    socket.on('disconnect', () => {
+    client.on('disconnect', () => {
         console.log('user disconnected');
     });
 });

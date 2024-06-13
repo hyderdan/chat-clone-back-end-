@@ -81,19 +81,31 @@ const AddToFriendList = async (req, res) => {
         const { friend_id } = req.body;
         const { ID } = req.params;
         const user = await userData.findById(ID);
+        const FriendUser = await userData.findById(friend_id);
         // console.log(user);
         const existingItemIndex = user.freindList.findIndex((item) => item.freindId.toString() === friend_id);
+        const existingItemIndex2 = FriendUser.freindList.findIndex((item) => item.freindId.toString() === ID);
+        const existingItem = user.Favourates.find(item => item.FavListId.toString() === friend_id);
         if (friend_id == ID) {
             console.log(`can't add your own account to your Freind List`);
-        } else if (existingItemIndex !== -1) {
+            
+        }else if(existingItem){
+            res.status(202).json({ mes: 'please remove user from favourates first' })
+        }
+         else if (existingItemIndex !== -1 && existingItemIndex2 !== -1) {
             user.freindList.splice(existingItemIndex, 1);
+            FriendUser.freindList.splice(existingItemIndex2, 1);
             res.status(202).json({ mes: 'user removed from your friend list' })
             await user.save();
+            await FriendUser.save();
 
-        } else {
+        }else {
             user.freindList.push({ freindId: friend_id });
+            FriendUser.freindList.push({ freindId: ID });
             res.status(202).json({ mes: 'user added to your friend list' });
             await user.save();
+            await FriendUser.save();
+
         }
     } catch (err) {
         console.log(err);
@@ -104,7 +116,7 @@ const friends = async (req, res) => {
         const { userid } = req.params
         const user = await userData.findById(userid);
         const friendIds = user.freindList.map(item => item.freindId);
-        console.log(friendIds);
+        // console.log(friendIds);
         const friendList = await userData.find({ _id: { $in: friendIds } });
         // console.log(friendList);
         res.status(202).json({ friendList: friendList, friendId: friendIds });
@@ -149,7 +161,7 @@ const GetFavourates = async (req, res) => {
         } else {
             const FavouratesIds = user.Favourates.map(item => item.FavListId);
             const FavouratesDatas = await userData.find({ _id: { $in: FavouratesIds } });
-            console.log(FavouratesDatas);
+            // console.log(FavouratesDatas);
             res.status(202).json({ Favourates: FavouratesDatas, FavId: FavouratesIds });
         }
 
