@@ -7,7 +7,7 @@
 /bazel-out
 
 # Node
-
+/chat-application-6f43e-firebase-adminsdk-yg075-7efb60a401.json
 /node_modules
 npm-debug.log
 yarn-error.log
