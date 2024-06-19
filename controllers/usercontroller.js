@@ -1,5 +1,6 @@
 const { userData } = require('../models/usersModel');
 const bcryp = require('bcrypt');
+const { Timestamp } = require('firebase-admin/firestore');
 const jwt = require('jsonwebtoken');
 const { get } = require('mongoose');
 // const JWTVALUE = process.env.KEY;
@@ -88,18 +89,18 @@ const AddToFriendList = async (req, res) => {
         const existingItem = user.Favourates.find(item => item.FavListId.toString() === friend_id);
         if (friend_id == ID) {
             console.log(`can't add your own account to your Freind List`);
-            
-        }else if(existingItem){
+
+        } else if (existingItem) {
             res.status(202).json({ mes: 'please remove user from favourates first' })
         }
-         else if (existingItemIndex !== -1 && existingItemIndex2 !== -1) {
+        else if (existingItemIndex !== -1 && existingItemIndex2 !== -1) {
             user.freindList.splice(existingItemIndex, 1);
             FriendUser.freindList.splice(existingItemIndex2, 1);
             res.status(202).json({ mes: 'user removed from your friend list' })
             await user.save();
             await FriendUser.save();
 
-        }else {
+        } else {
             user.freindList.push({ freindId: friend_id });
             FriendUser.freindList.push({ freindId: ID });
             res.status(202).json({ mes: 'user added to your friend list' });
@@ -169,6 +170,14 @@ const GetFavourates = async (req, res) => {
         console.log(err);
     }
 }
+// const sendMessage = async (req, res) => {
+//     try {
+//         const { username, message } = req.body;
+//         const messageData = { username, message, Timestamp: Date.now() };
+//     } catch (err) {
+//         console.log(err);
+//     }
+// }
 module.exports = {
     SignUp, LoginUser, userDeatails, searchUser, AddToFriendList, friends, AddToFavourates, GetFavourates
 }
