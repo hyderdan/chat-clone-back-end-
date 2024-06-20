@@ -26,6 +26,15 @@ admin.initializeApp({
     "https://chat-application-6f43e-default-rtdb.firebaseio.com"
 });
 const db =admin.database();
+const sockectIo = require('socket.io');
+const http = require('http');
+const server = http.createServer(app);
+const io = sockectIo(server, {
+    cors: {
+        origin: "http://localhost:4200", // Adjust this to match your Angular app's URL
+        methods: ["GET", "POST"]
+    }
+});
 
 app.post('/send-mes', async (req, res) => {
     try {
@@ -37,17 +46,33 @@ app.post('/send-mes', async (req, res) => {
         console.log(err); 
     }
 });
-app.get('/get-mes', async(req,res)=>{
-    try{
-        const messageRef = db.ref('message');
-        messageRef.once('value',(snapshot)=>{
-            const messages = snapshot.val();
-            res.status(200).json(messages);
-        })
-    }catch(err){
-        console.log(err);
+app.get('/get-mes', async (req, res) => {
+    try {
+      const messageRef = db.ref('messages');
+      messageRef.once('value', (snapshot) => {
+        const messages = snapshot.val();
+        if (messages) {
+          res.status(200).json(messages);
+          console.log(messages, 'hello');
+        } else {
+          res.status(404).json({ error: 'No messages found' });
+          console.log('No messages found');
+        }
+      }, (errorObject) => {
+        res.status(500).json({ error: 'Error reading data' });
+        console.log('Read failed: ' + errorObject.name);
+      });
+    } catch (err) {
+      res.status(500).json({ error: 'Internal Server Error' });
+      console.log(err);
     }
-})
+  });
+
+  db.ref('messages').on('child_added',(snapshot)=>{
+    const messages = snapshot.val();
+    io.emit('new-messages', messages);
+    console.log(messages);
+  })
 
 
 app.listen(PORT, () => {
