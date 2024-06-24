@@ -70,11 +70,12 @@ app.get('/get-mes', async (req, res) => {
 
   db.ref('messages').on('child_added',(snapshot)=>{
     const messages = snapshot.val();
-    io.emit('new-messages', messages);
+    io.emit('new-message', messages);
     console.log(messages);
   })
+ 
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log('server starts at port',PORT)
 });
