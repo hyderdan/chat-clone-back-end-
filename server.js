@@ -46,19 +46,48 @@ app.post('/send-mes', async (req, res) => {
     console.log(err);
   }
 });
+const deleteConversation = async (senderid, receiverid) => {
+  const messagesRef = db.ref('messages');
+  const snapshot = await messagesRef.once('value');
+  
+  snapshot.forEach(childSnapshot => {
+    const message = childSnapshot.val();
+    const { sender_id, receiver_id } = message;
+
+    // Check if the message is between the two users
+    if ((sender_id === senderid  && receiver_id === receiverid) || (sender_id === receiverid && receiver_id === senderid)) {
+      // Remove the message
+      childSnapshot.ref.remove();
+    }
+  });
+};
+app.post('/del-mes', async (req, res) => {
+  try {
+    const { sender_id, receiver_id } = req.body;
+    if (!sender_id || !receiver_id) {
+      return res.status(400).json({ error: 'User IDs are required' });
+    }
+    await deleteConversation(sender_id, receiver_id)
+    res.status(200).json({ message: 'Friend and chat history deleted successfully' });
+    console.log('Friend and chat history deleted successfully');
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 app.get('/get-mes/:sender_id/:receiver_id', async (req, res) => {
-    const{sender_id,receiver_id} = req.params
+  const { sender_id, receiver_id } = req.params
   try {
     const messageRef = db.ref('messages');
     messageRef.once('value', (snapshot) => {
       const messages = snapshot.val();
       if (messages) {
-        const filteredMessages = Object.values(messages).filter(message => 
+        const filteredMessages = Object.values(messages).filter(message =>
           (message.sender_id === sender_id && message.receiver_id === receiver_id) ||
           (message.sender_id === receiver_id && message.receiver_id === sender_id)
-      );
+        );
         res.status(200).json(filteredMessages);
-        console.log(filteredMessages, 'hello');
+        // console.log(filteredMessages, 'hello');
       } else {
         res.status(404).json({ error: 'No messages found' });
         console.log('No messages found');
