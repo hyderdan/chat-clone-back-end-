@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { CONNECT } = require('./config');
-const { userROutes } = require('./routes/userRoutes');
+const  {initUserRoutes} = require('./routes/userRoutes');
 const admin = require('firebase-admin');
 const serviceAccount = require('./chat-application-6f43e-firebase-adminsdk-yg075-7efb60a401.json');
 const app = express();
@@ -17,7 +17,6 @@ app.use(cors(
     credentials: true
   }
 ));
-app.use('/users', userROutes);
 
 admin.initializeApp({
   credential:
@@ -35,6 +34,8 @@ const io = sockectIo(server, {
     methods: ["GET", "POST"]
   }
 });
+const userRoutes = initUserRoutes(io)
+app.use('/users', userRoutes);
 
 app.post('/send-mes', async (req, res) => {
   try {

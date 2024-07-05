@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 const { get } = require('mongoose');
 // const JWTVALUE = process.env.KEY;
 
+const userControll = (io) => {
+
+
 const SignUp = async (req, res) => {
     try {
         const { username, phoneNo, password, confirmPass } = req.body;
@@ -96,16 +99,19 @@ const AddToFriendList = async (req, res) => {
         else if (existingItemIndex !== -1 && existingItemIndex2 !== -1) {
             user.freindList.splice(existingItemIndex, 1);
             FriendUser.freindList.splice(existingItemIndex2, 1);
-            res.status(202).json({ mes: 'user removed from your friend list' })
             await user.save();
             await FriendUser.save();
+            io.emit('friendListUpdate', { userId: ID, friendId: friend_id, action: 'remove' });
+            res.status(202).json({ mes: 'user removed from your friend list' });
 
         } else {
             user.freindList.push({ freindId: friend_id });
             FriendUser.freindList.push({ freindId: ID });
-            res.status(202).json({ mes: 'user added to your friend list' });
             await user.save();
             await FriendUser.save();
+            io.emit('friendListUpdate', { userId: ID, friendId: friend_id, action: 'add' });
+            res.status(202).json({ mes: 'user added to your friend list' });
+
 
         }
     } catch (err) {
@@ -170,14 +176,12 @@ const GetFavourates = async (req, res) => {
         console.log(err);
     }
 }
-// const sendMessage = async (req, res) => {
-//     try {
-//         const { username, message } = req.body;
-//         const messageData = { username, message, Timestamp: Date.now() };
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
+return{
+    SignUp, LoginUser, userDeatails, searchUser,
+     AddToFriendList, friends, AddToFavourates, GetFavourates
+
+}
+}
 module.exports = {
-    SignUp, LoginUser, userDeatails, searchUser, AddToFriendList, friends, AddToFavourates, GetFavourates
+    userControll
 }
