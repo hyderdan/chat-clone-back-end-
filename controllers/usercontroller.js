@@ -125,8 +125,9 @@ const userControll = (io) => {
             const friendIds = user.freindList.map(item => item.freindId);
             // console.log(friendIds);
             const friendList = await userData.find({ _id: { $in: friendIds } });
-            // console.log(friendList);
-            res.status(202).json({ friendList: friendList, friendId: friendIds,  });
+            const userName = friendList.map((item)=> item.username);
+                        console.log(userName);
+            res.status(202).json({ friendList: friendList, friendId: friendIds, userName: userName  });
         } catch (err) {
             console.log(err);
         }
