@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { CONNECT } = require('./config');
-const  {initUserRoutes} = require('./routes/userRoutes');
+const { initUserRoutes } = require('./routes/userRoutes');
 const admin = require('firebase-admin');
 const serviceAccount = require('./chat-application-6f43e-firebase-adminsdk-yg075-7efb60a401.json');
 const app = express();
@@ -50,13 +50,13 @@ app.post('/send-mes', async (req, res) => {
 const deleteConversation = async (senderid, receiverid) => {
   const messagesRef = db.ref('messages');
   const snapshot = await messagesRef.once('value');
-  
+
   snapshot.forEach(childSnapshot => {
     const message = childSnapshot.val();
     const { sender_id, receiver_id } = message;
 
     // Check if the message is between the two users
-    if ((sender_id === senderid  && receiver_id === receiverid) || (sender_id === receiverid && receiver_id === senderid)) {
+    if ((sender_id === senderid && receiver_id === receiverid) || (sender_id === receiverid && receiver_id === senderid)) {
       // Remove the message
       childSnapshot.ref.remove();
     }
@@ -105,7 +105,7 @@ app.get('/get-mes/:sender_id/:receiver_id', async (req, res) => {
 
 db.ref('messages').on('child_added', (snapshot) => {
   const messages = snapshot.val();
-  io.emit('new-message', messages);
+  io.emit('new-message', { messages, newChat: 'true' });
   console.log(messages);
 })
 
