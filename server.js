@@ -105,8 +105,14 @@ app.get('/get-mes/:sender_id/:receiver_id', async (req, res) => {
 
 db.ref('messages').on('child_added', (snapshot) => {
   const messages = snapshot.val();
-  io.emit('new-message', { messages, newChat: 'true' });
+  io.emit('new-message',  messages);
   console.log(messages);
+});
+
+db.ref('messages').on('child_added', (snapshot) => {
+  const newChat = true;
+  io.emit('new-chat',  newChat);
+  console.log(newChat);
 })
 
 
