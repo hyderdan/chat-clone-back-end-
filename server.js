@@ -110,7 +110,12 @@ db.ref('messages').on('child_added', (snapshot) => {
 });
 
 db.ref('messages').on('child_added', (snapshot) => {
-  const newChat = true;
+  const messages = snapshot.val();
+  const newChat = {
+    senderId: messages.receiver_id,
+    receiverId: messages.sender_id,
+    newChat: true
+  };
   io.emit('new-chat',  newChat);
   console.log(newChat);
 })
