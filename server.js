@@ -61,6 +61,9 @@ const deleteConversation = async (senderid, receiverid) => {
       childSnapshot.ref.remove();
     }
   });
+
+  io.emit('delete-message', { senderid, receiverid });
+
 };
 app.post('/del-mes', async (req, res) => {
   try {
